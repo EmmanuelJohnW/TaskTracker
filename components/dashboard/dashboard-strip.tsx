@@ -1,6 +1,7 @@
 "use client"
 
-import { AlertTriangleIcon, CalendarClockIcon, CheckCircle2Icon } from "lucide-react"
+import { AlertTriangleIcon, CalendarClockIcon, CheckCircle2Icon, FlameIcon } from "lucide-react"
+import Link from "next/link"
 import { cn } from "cn"
 import { useMemo } from "react"
 
@@ -9,16 +10,18 @@ import { ColorDot } from "@/components/task/task-meta"
 import { useFilters } from "@/hooks/use-filters"
 import type { DueFilter } from "@/lib/tasks/filters"
 import { computeStats, type WorkspaceSplit } from "@/lib/tasks/stats"
+import { computeStreak } from "@/lib/tasks/streak"
 
 export function DashboardStrip({ now }: { now: Date }) {
   const { tasks, workspaces } = useAppData()
   const { filters, setFilters } = useFilters()
   const stats = useMemo(() => computeStats(tasks, workspaces, now), [tasks, workspaces, now])
+  const streak = useMemo(() => computeStreak(tasks, now), [tasks, now])
 
   const toggleDue = (due: DueFilter) => setFilters({ due: filters.due === due ? null : due })
 
   return (
-    <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
+    <div className="grid grid-cols-2 gap-2 md:grid-cols-3 xl:grid-cols-5">
       <StatTile
         label="Overdue"
         value={stats.overdue}
@@ -41,6 +44,23 @@ export function DashboardStrip({ now }: { now: Date }) {
         icon={<CheckCircle2Icon className="size-4" />}
         tone="text-emerald-500"
       />
+      <Link
+        href="/stats"
+        className="flex flex-col items-start gap-0.5 rounded-xl border bg-card px-3 py-2 transition-colors hover:border-foreground/20"
+        title={streak.isActiveToday || streak.current === 0 ? "View stats" : "Complete a task today to keep your streak"}
+      >
+        <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <FlameIcon className={streak.current > 0 ? "size-4 text-orange-500" : "size-4"} />
+          Streak
+        </span>
+        <span className="text-2xl font-semibold tabular-nums">
+          {streak.current}
+          <span className="ml-1 text-xs font-normal text-muted-foreground">
+            {streak.current === 1 ? "day" : "days"}
+            {streak.current > 0 && !streak.isActiveToday ? " · at risk" : ""}
+          </span>
+        </span>
+      </Link>
       <SplitTile split={stats.split} total={stats.openTotal} />
     </div>
   )

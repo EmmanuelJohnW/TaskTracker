@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "cn"
-import { CalendarDaysIcon, KanbanSquareIcon, ListIcon, LogOutIcon, MenuIcon, PlusIcon, UserIcon } from "lucide-react"
+import { BarChart3Icon, CalendarDaysIcon, KanbanSquareIcon, ListIcon, LogOutIcon, MenuIcon, PlusIcon, UserIcon } from "lucide-react"
 import Link from "next/link"
 import { usePathname, useSearchParams } from "next/navigation"
 
@@ -27,6 +27,7 @@ const VIEWS = [
   { href: "/board", label: "Board", icon: KanbanSquareIcon },
   { href: "/list", label: "List", icon: ListIcon },
   { href: "/calendar", label: "Calendar", icon: CalendarDaysIcon },
+  { href: "/stats", label: "Stats", icon: BarChart3Icon },
 ] as const
 
 interface HeaderProps {

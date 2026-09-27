@@ -12,8 +12,10 @@ A personal task tracker for juggling coursework and work projects: a Kanban boar
 - **Organisation:** the sidebar lists All, then each workspace (Study and Work are created on your first login). Under each workspace you can create, rename, recolour and archive projects.
 - **Filters:** project, priority, tags, due range and text search. They're stored in the URL, so any view can be bookmarked or shared.
 - **Editor:** a side sheet with title, markdown description (Write/Preview), workspace, project, status, priority, deadline (date plus optional time), tags (create them inline) and a subtask checklist. Closing the sheet saves pending edits.
-- **Views:** Board, List (grouped Overdue / Today / Tomorrow / This Week / Later / No Date, sortable by due date or priority) and Calendar (month grid).
-- **Dashboard strip:** overdue count, due this week, done this week, and open tasks split by workspace.
+- **Views:** Board, List (grouped Overdue / Today / Tomorrow / This Week / Later / No Date, sortable by due date or priority), Calendar (month grid) and Stats.
+- **Dashboard strip:** overdue count, due this week, done this week, your current streak, and open tasks split by workspace.
+- **Streaks:** consecutive days with at least one completed task, counted in your local timezone. Today doesn't break a streak until it's over. Reopening a task removes its completion.
+- **Stats:** current and longest streak, completions this week and all time, on-time rate against deadlines, a 26-week activity heatmap, completions per week, breakdowns by priority, workspace and project, and a table of recent completions. The sidebar and filters scope it, except the due-date filter.
 - **Shortcuts:** `n` new task · `/` focus search · `Esc` close the editor · `Space` to pick up and drop a focused card · `Enter` to open it.
 - Dark mode by default with a light-mode toggle. On mobile the board scrolls one column at a time and the sidebar becomes a drawer.
 
@@ -117,14 +119,14 @@ Email confirmation is on by default for hosted projects. In that case, sign-up s
 app/
   (auth)/login/           sign in, sign up, magic link
   (app)/layout.tsx        loads the signed-in user's data once, then renders the shell
-  (app)/board|list|calendar/
+  (app)/board|list|calendar|stats/
   auth/callback/route.ts  completes magic-link and email-confirmation sign-ins
 proxy.ts                  session refresh and route protection (Next 16's middleware)
 components/
   app/                    shell, sidebar, header, filter bar, data provider
   board/                  columns, cards, drag and drop, quick add
   task/                   editor sheet, fields, subtasks, tags, shared card metadata
-  list/ calendar/ dashboard/
+  list/ calendar/ dashboard/ stats/
   ui/                     shadcn/ui primitives
 lib/
   supabase/{client,server,middleware}.ts, database.types.ts

@@ -82,6 +82,14 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  /* Data viz: one sequential blue ramp (validated ordinal vs #ffffff). */
+  --viz-bar: #2a78d6;
+  --viz-heat-0: #eeeeec;
+  --viz-heat-1: #86b6ef;
+  --viz-heat-2: #5598e7;
+  --viz-heat-3: #256abf;
+  --viz-heat-4: #104281;
+  --viz-grid: #e1e0d9;
 }
 
 .dark {
@@ -116,6 +124,14 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+  /* Dark steps chosen for the dark card surface (validated vs #171717). */
+  --viz-bar: #3987e5;
+  --viz-heat-0: #242423;
+  --viz-heat-1: #184f95;
+  --viz-heat-2: #256abf;
+  --viz-heat-3: #5598e7;
+  --viz-heat-4: #9ec5f4;
+  --viz-grid: #2c2c2a;
 }
 
 @layer base {
