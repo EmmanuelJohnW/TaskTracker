@@ -70,7 +70,7 @@ function Board({ now }: { now: Date }) {
         <EmptyFiltered onClear={() => setFilters({ projectId: null, priorities: [], tagIds: [], due: null, query: "" })} />
       )}
       <DndContext sensors={sensors} collisionDetection={closestCorners} {...handlers}>
-        <div className="board-scroller -mx-4 flex min-h-0 flex-1 scroll-px-4 gap-3 overflow-x-auto px-4 pb-2 lg:mx-0 lg:scroll-px-0 lg:px-0">
+        <div className="board-scroller relative -mx-4 flex min-h-0 flex-1 scroll-px-4 gap-3 overflow-x-auto px-4 pb-2 lg:mx-0 lg:scroll-px-0 lg:px-0">
           {STATUSES.map((status) => (
             <BoardColumn
               key={status}
