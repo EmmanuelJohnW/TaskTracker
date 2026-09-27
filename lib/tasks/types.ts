@@ -33,6 +33,7 @@ export type Workspace = Tables<"workspaces">
 export type Project = Tables<"projects">
 export type Tag = Tables<"tags">
 export type Subtask = Tables<"subtasks">
+export type NotificationSettings = Tables<"notification_settings">
 
 /** A task row joined with the relations every view needs. */
 export interface TaskWithRelations extends Omit<Tables<"tasks">, "status" | "priority"> {

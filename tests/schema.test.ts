@@ -2,65 +2,21 @@
  * Runs the real migration and seed against PGlite (Postgres in WASM) with a
  * minimal stand-in for Supabase's `auth` schema, then exercises RLS as two users.
  */
-import { readFileSync, readdirSync } from "node:fs"
-import { join } from "node:path"
-
-import { PGlite } from "@electric-sql/pglite"
-import { pgcrypto } from "@electric-sql/pglite/contrib/pgcrypto"
+import type { PGlite } from "@electric-sql/pglite"
 import { beforeAll, describe, expect, test } from "vitest"
 
-const SUPABASE_DIR = join(__dirname, "..", "supabase")
+import { createTestDb, queryAs, readSql, scalar as scalarIn } from "./db-harness"
+
 const USER_A = "00000000-0000-4000-8000-000000000001" // seed.sql demo user
 const USER_B = "00000000-0000-4000-8000-0000000000bb"
 
-const AUTH_STUB = `
-  create schema auth;
-  create schema extensions;
-  create role authenticated;
-  create role anon;
-  create table auth.users (
-    instance_id uuid, id uuid primary key, aud text, role text, email text,
-    encrypted_password text, email_confirmed_at timestamptz,
-    raw_app_meta_data jsonb, raw_user_meta_data jsonb,
-    created_at timestamptz, updated_at timestamptz, confirmation_token text,
-    recovery_token text, email_change_token_new text, email_change text
-  );
-  create table auth.identities (
-    id uuid, user_id uuid, provider_id text, identity_data jsonb, provider text,
-    last_sign_in_at timestamptz, created_at timestamptz, updated_at timestamptz
-  );
-  create function auth.uid() returns uuid language sql stable as $$
-    select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid
-  $$;
-  grant usage on schema auth, public to authenticated;
-`
-
-const readSql = (path: string) => readFileSync(join(SUPABASE_DIR, path), "utf8")
-
 let db: PGlite
 
-async function asUser<T>(userId: string, sql: string): Promise<T[]> {
-  await db.exec(
-    `set role authenticated; select set_config('request.jwt.claim.sub', '${userId}', false);`
-  )
-  try {
-    return (await db.query<T>(sql)).rows
-  } finally {
-    await db.exec("reset role;")
-  }
-}
-
-async function scalar(sql: string): Promise<unknown> {
-  const rows = await db.query<Record<string, unknown>>(sql)
-  return Object.values(rows.rows[0])[0]
-}
+const asUser = <T,>(userId: string, sql: string) => queryAs<T>(db, "authenticated", userId, sql)
+const scalar = (sql: string) => scalarIn(db, sql)
 
 beforeAll(async () => {
-  db = new PGlite({ extensions: { pgcrypto } })
-  await db.exec(AUTH_STUB)
-  const migrations = readdirSync(join(SUPABASE_DIR, "migrations")).filter((f) => f.endsWith(".sql")).sort()
-  for (const file of migrations) await db.exec(readSql(`migrations/${file}`))
-  await db.exec("grant all on all tables in schema public to authenticated;")
+  db = await createTestDb()
   await db.exec(readSql("seed.sql"))
   await db.exec(readSql("seed.sql")) // re-running the seed must be safe
   await db.exec(`insert into auth.users (id, email) values ('${USER_B}', 'b@example.com')`)

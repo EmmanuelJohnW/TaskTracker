@@ -1,4 +1,5 @@
-// Regenerates app/favicon.ico and app/apple-icon.png from app/icon.svg.
+// Regenerates every raster icon (favicon, Apple touch icon, PWA manifest
+// icons and the notification badge) from app/icon.svg.
 // Run with `npm run icons` after changing the logo.
 import { readFileSync, writeFileSync } from "node:fs"
 import { createRequire } from "node:module"
@@ -34,10 +35,22 @@ const icoSizes = [16, 32, 48]
 const icoImages = await Promise.all(icoSizes.map(async (size) => ({ size, data: await render(svg, size) })))
 writeFileSync(new URL("../app/favicon.ico", import.meta.url), toIco(icoImages))
 
-// iOS masks its own rounded corners, so the touch icon is full-bleed with extra padding.
-const appleSvg = svg
-  .replace(/<rect([^>]*)rx="8"([^>]*)\/>/, '<rect$1rx="0"$2/><g transform="translate(16 16) scale(0.86) translate(-16 -16)">')
-  .replace("</svg>", "</g></svg>")
-writeFileSync(new URL("../app/apple-icon.png", import.meta.url), await render(appleSvg, 180))
+/** Full-bleed variant with the mark scaled into the platform's safe zone. */
+const fullBleed = (scale) =>
+  svg
+    .replace(/<rect([^>]*)rx="8"([^>]*)\/>/, `<rect$1rx="0"$2/><g transform="translate(16 16) scale(${scale}) translate(-16 -16)">`)
+    .replace("</svg>", "</g></svg>")
 
-console.log("Wrote app/favicon.ico (16/32/48) and app/apple-icon.png (180)")
+const out = (path) => new URL(`../${path}`, import.meta.url)
+
+// iOS masks its own rounded corners; Android maskable icons need an 80% safe zone.
+writeFileSync(out("app/apple-icon.png"), await render(fullBleed(0.86), 180))
+writeFileSync(out("public/icon-192.png"), await render(svg, 192))
+writeFileSync(out("public/icon-512.png"), await render(svg, 512))
+writeFileSync(out("public/icon-maskable-512.png"), await render(fullBleed(0.72), 512))
+
+// Android status-bar badge: the mark alone, white on transparent.
+const badge = svg.replace(/<rect[^>]*\/>/, "").replace('stroke-opacity="0.3"', 'stroke-opacity="0.45"')
+writeFileSync(out("public/badge-96.png"), await render(badge, 96))
+
+console.log("Wrote favicon.ico, apple-icon.png and public/{icon-192,icon-512,icon-maskable-512,badge-96}.png")

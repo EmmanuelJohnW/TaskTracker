@@ -1,9 +1,9 @@
 "use client"
 
 import { cn } from "cn"
-import { BarChart3Icon, CalendarDaysIcon, KanbanSquareIcon, ListIcon, LogOutIcon, MenuIcon, PlusIcon, UserIcon } from "lucide-react"
+import { BarChart3Icon, CalendarDaysIcon, KanbanSquareIcon, ListIcon, LogOutIcon, MenuIcon, PlusIcon, SettingsIcon, UserIcon } from "lucide-react"
 import Link from "next/link"
-import { usePathname, useSearchParams } from "next/navigation"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
 import { useAppData } from "@/components/app/app-data-provider"
 import { FilterBar } from "@/components/app/filter-bar"
@@ -45,7 +45,9 @@ export function Header({ email, onOpenSidebar }: HeaderProps) {
 
   const workspace = workspaces.find((item) => item.id === filters.workspaceId)
   const project = projects.find((item) => item.id === filters.projectId)
-  const heading = project?.name ?? workspace?.name ?? "All tasks"
+  const isSettings = pathname.startsWith("/settings")
+  const heading = isSettings ? "Settings" : project?.name ?? workspace?.name ?? "All tasks"
+  const router = useRouter()
 
   return (
     <header className="space-y-3 border-b px-4 py-3">
@@ -107,6 +109,10 @@ export function Header({ email, onOpenSidebar }: HeaderProps) {
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => router.push("/settings")}>
+                <SettingsIcon /> Notifications & calendar
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => void signOut()}>
                 <LogOutIcon /> Sign out
               </DropdownMenuItem>
@@ -114,7 +120,7 @@ export function Header({ email, onOpenSidebar }: HeaderProps) {
           </DropdownMenu>
         </div>
       </div>
-      <FilterBar />
+      {!isSettings && <FilterBar />}
     </header>
   )
 }

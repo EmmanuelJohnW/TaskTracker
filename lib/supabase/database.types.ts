@@ -39,6 +39,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      notification_log: {
+        Row: {
+          dedupe_key: string
+          kind: string
+          sent_at: string
+          user_id: string
+        }
+        Insert: {
+          dedupe_key: string
+          kind: string
+          sent_at?: string
+          user_id: string
+        }
+        Update: {
+          dedupe_key?: string
+          kind?: string
+          sent_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notification_settings: {
+        Row: {
+          calendar_token: string
+          daily_summary_enabled: boolean
+          daily_summary_hour: number
+          due_soon_enabled: boolean
+          due_soon_minutes: number
+          streak_reminder_enabled: boolean
+          streak_reminder_hour: number
+          timezone: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          calendar_token?: string
+          daily_summary_enabled?: boolean
+          daily_summary_hour?: number
+          due_soon_enabled?: boolean
+          due_soon_minutes?: number
+          streak_reminder_enabled?: boolean
+          streak_reminder_hour?: number
+          timezone?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          calendar_token?: string
+          daily_summary_enabled?: boolean
+          daily_summary_hour?: number
+          due_soon_enabled?: boolean
+          due_soon_minutes?: number
+          streak_reminder_enabled?: boolean
+          streak_reminder_hour?: number
+          timezone?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       projects: {
         Row: {
           archived: boolean | null
@@ -76,6 +136,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          p256dh: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          p256dh: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       subtasks: {
         Row: {
@@ -264,10 +354,48 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calendar_feed: {
+        Args: { p_token: string }
+        Returns: {
+          description: string
+          due_at: string
+          id: string
+          priority: string
+          project_name: string
+          timezone: string
+          title: string
+          updated_at: string
+          workspace_name: string
+        }[]
+      }
+      claim_notifications: {
+        Args: { p_secret: string }
+        Returns: {
+          body: string
+          kind: string
+          subscriptions: Json
+          tag: string
+          title: string
+          url: string
+        }[]
+      }
       owns_project: { Args: { p_id: string }; Returns: boolean }
       owns_tag: { Args: { t_id: string }; Returns: boolean }
       owns_task: { Args: { t_id: string }; Returns: boolean }
       owns_workspace: { Args: { ws_id: string }; Returns: boolean }
+      remove_push_subscriptions: {
+        Args: { p_endpoints: string[]; p_secret: string }
+        Returns: undefined
+      }
+      save_push_subscription: {
+        Args: {
+          p_auth: string
+          p_endpoint: string
+          p_p256dh: string
+          p_user_agent?: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

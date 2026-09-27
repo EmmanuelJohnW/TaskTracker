@@ -3,6 +3,7 @@
 import { useSearchParams } from "next/navigation"
 import { useMemo, useState } from "react"
 
+import { useAppData } from "@/components/app/app-data-provider"
 import { SEARCH_INPUT_ID } from "@/components/app/filter-bar"
 import { Header } from "@/components/app/header"
 import { Logo } from "@/components/app/logo"
@@ -11,6 +12,8 @@ import { TaskEditorSheet } from "@/components/task/task-editor-sheet"
 import { useTaskEditor } from "@/components/task/task-editor-provider"
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet"
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts"
+import { useTaskDeepLink } from "@/hooks/use-task-deep-link"
+import { useTimezoneSync } from "@/hooks/use-timezone-sync"
 import { parseFilters } from "@/lib/tasks/filters"
 
 interface AppShellProps {
@@ -22,6 +25,9 @@ export function AppShell({ email, children }: AppShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const { openNew } = useTaskEditor()
   const searchParams = useSearchParams()
+  const { notificationSettings } = useAppData()
+  useTimezoneSync(notificationSettings?.timezone)
+  useTaskDeepLink()
 
   const shortcuts = useMemo(
     () => ({

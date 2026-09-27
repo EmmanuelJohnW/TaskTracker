@@ -4,7 +4,8 @@ import { NextResponse, type NextRequest } from "next/server"
 import { getSupabaseEnv } from "@/lib/env"
 import type { Database } from "@/lib/supabase/database.types"
 
-const PUBLIC_PATHS = ["/login", "/auth"]
+// Machine-called routes authenticate themselves (cron secret, calendar token).
+const PUBLIC_PATHS = ["/login", "/auth", "/api/calendar", "/api/notifications/dispatch"]
 
 function isPublicPath(pathname: string) {
   return PUBLIC_PATHS.some(

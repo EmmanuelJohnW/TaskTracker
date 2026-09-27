@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server"
 import {
   isPriority,
   isStatus,
+  type NotificationSettings,
   type Project,
   type Tag,
   type TaskWithRelations,
@@ -16,6 +17,7 @@ export interface AppData {
   projects: Project[]
   tags: Tag[]
   tasks: TaskWithRelations[]
+  notificationSettings: NotificationSettings | null
 }
 
 const TASK_SELECT = "*, subtasks(*), task_tags(tags(*))"
@@ -27,14 +29,15 @@ const TASK_SELECT = "*, subtasks(*), task_tags(tags(*))"
  */
 export async function loadAppData(): Promise<AppData> {
   const supabase = await createClient()
-  const [workspaces, projects, tags, tasks] = await Promise.all([
+  const [workspaces, projects, tags, tasks, settings] = await Promise.all([
     supabase.from("workspaces").select("*").order("position").order("created_at"),
     supabase.from("projects").select("*").order("created_at"),
     supabase.from("tags").select("*").order("name"),
     supabase.from("tasks").select(TASK_SELECT).order("position"),
+    supabase.from("notification_settings").select("*").maybeSingle(),
   ])
 
-  const failed = [workspaces, projects, tags, tasks].find((result) => result.error)
+  const failed = [workspaces, projects, tags, tasks, settings].find((result) => result.error)
   if (failed?.error) {
     logError("loadAppData", failed.error)
     throw new Error("Could not load your tasks. Please refresh to try again.")
@@ -44,6 +47,7 @@ export async function loadAppData(): Promise<AppData> {
     workspaces: workspaces.data ?? [],
     projects: projects.data ?? [],
     tags: tags.data ?? [],
+    notificationSettings: settings.data,
     tasks: (tasks.data ?? []).map(({ task_tags, subtasks, status, priority, ...task }) => ({
       ...task,
       status: isStatus(status) ? status : "todo",

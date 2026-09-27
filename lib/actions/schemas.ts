@@ -91,3 +91,22 @@ export const updateProjectSchema = z.object({
   id,
   patch: z.object({ name, color: hexColor, archived: z.boolean() }).partial(),
 })
+
+export const DUE_SOON_OPTIONS = [15, 30, 60, 120, 1440] as const
+const hour = z.number().int().min(0).max(23)
+
+export const notificationSettingsSchema = z
+  .object({
+    timezone: z.string().min(1).max(64),
+    due_soon_enabled: z.boolean(),
+    due_soon_minutes: z.union(DUE_SOON_OPTIONS.map((value) => z.literal(value))),
+    daily_summary_enabled: z.boolean(),
+    daily_summary_hour: hour,
+    streak_reminder_enabled: z.boolean(),
+    streak_reminder_hour: hour,
+  })
+  .partial()
+  .refine((patch) => Object.keys(patch).length > 0, { message: "Nothing to update" })
+export type NotificationSettingsPatch = z.input<typeof notificationSettingsSchema>
+
+export const endpointSchema = z.object({ endpoint: z.url().startsWith("https://").max(2048) })

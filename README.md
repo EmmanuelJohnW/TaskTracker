@@ -16,6 +16,7 @@ A personal task tracker for juggling coursework and work projects: a Kanban boar
 - **Dashboard strip:** overdue count, due this week, done this week, your current streak, and open tasks split by workspace.
 - **Streaks:** consecutive days with at least one completed task, counted in your local timezone. Today doesn't break a streak until it's over. Reopening a task removes its completion.
 - **Stats:** current and longest streak, completions this week and all time, on-time rate against deadlines, a 26-week activity heatmap, completions per week, breakdowns by priority, workspace and project, and a table of recent completions. The sidebar and filters scope it, except the due-date filter.
+- **Reminders:** push notifications and a calendar feed (see [Notifications](#notifications)).
 - **Shortcuts:** `n` new task · `/` focus search · `Esc` close the editor · `Space` to pick up and drop a focused card · `Enter` to open it.
 - Dark mode by default with a light-mode toggle. On mobile the board scrolls one column at a time and the sidebar becomes a drawer.
 
@@ -102,6 +103,27 @@ Email confirmation is on by default for hosted projects. In that case, sign-up s
 4. Deploy.
 5. Add the deployment URL to Supabase's **Site URL** and **Redirect URLs** (see the table above), then redeploy if you changed any env vars.
 
+## Notifications
+
+Tracker can remind you even when it's closed, in two ways. Both are managed under **Account → Notifications & calendar**.
+
+- **Push notifications:** alerts before timed deadlines (15 minutes to 1 day ahead), a daily summary of what's due or overdue, and an optional evening streak reminder. Times follow your timezone, which syncs from the browser automatically. Turn push on separately on each device. On iPhone and iPad, first add Tracker to your Home Screen (*Share → Add to Home Screen*; needs iOS 16.4 or later), then turn notifications on from the Home Screen app.
+- **Calendar feed:** a private `webcal://` link that shows open tasks with deadlines in Apple Calendar or Google Calendar, with the calendar's own alerts. Anyone with the link can read your task titles, so reset it from Settings if it ever leaks.
+
+### How reminders are sent
+
+A Supabase `pg_cron` job calls `POST /api/notifications/dispatch` every 5 minutes, carrying a secret it reads from Supabase Vault at run time. The route asks the database which reminders are due. The database records each one before it's sent, so each reminder goes out at most once. The route then delivers them with Web Push (VAPID). Devices the push service reports as gone are removed automatically. No Supabase `service_role` key is used anywhere: the scheduler and calendar routes can only reach a few narrow database functions, gated by the cron secret or the calendar token.
+
+### One-time setup (per deployment)
+
+```bash
+npm run setup:notifications -- https://your-app.vercel.app
+```
+
+This generates the VAPID keys (only if none exist yet) and a fresh cron secret. It saves them to Vercel's production environment and Supabase Vault, schedules the `pg_cron` job, and redeploys. Secret values are never printed. Pass `--rotate-vapid` to replace the VAPID keys (every device must then turn notifications on again), or `--no-deploy` to skip the redeploy. It needs `vercel link` and `supabase link` done first.
+
+For local push testing, run `next dev --experimental-https` and put `NEXT_PUBLIC_VAPID_PUBLIC_KEY` and `VAPID_PRIVATE_KEY` from `npx web-push generate-vapid-keys` in `.env.local`.
+
 ## Scripts
 
 | Script | What it does |
@@ -112,6 +134,8 @@ Email confirmation is on by default for hosted projects. In that case, sign-up s
 | `npm test` | Vitest: domain logic plus a schema/RLS test that runs the real migration and seed in PGlite |
 | `npm run db:start` / `db:reset` | Start the local Supabase stack / re-apply migrations and seed |
 | `npm run db:types` / `db:types:remote` | Regenerate Supabase types |
+| `npm run icons` | Regenerate all raster icons from `app/icon.svg` |
+| `npm run setup:notifications -- <url>` | One-time push reminder setup (see Notifications) |
 
 ## Project structure
 
