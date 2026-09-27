@@ -5,6 +5,7 @@ import { useMemo, useState } from "react"
 
 import { SEARCH_INPUT_ID } from "@/components/app/filter-bar"
 import { Header } from "@/components/app/header"
+import { Logo } from "@/components/app/logo"
 import { Sidebar } from "@/components/app/sidebar"
 import { TaskEditorSheet } from "@/components/task/task-editor-sheet"
 import { useTaskEditor } from "@/components/task/task-editor-provider"
@@ -35,7 +36,7 @@ export function AppShell({ email, children }: AppShellProps) {
   useKeyboardShortcuts(shortcuts)
 
   return (
-    <div className="flex h-dvh overflow-hidden">
+    <div className="relative flex h-dvh overflow-hidden">
       <aside className="hidden w-60 shrink-0 border-r bg-sidebar lg:block">
         <SidebarBrand />
         <Sidebar />
@@ -58,9 +59,8 @@ export function AppShell({ email, children }: AppShellProps) {
 
 function SidebarBrand() {
   return (
-    <div className="flex h-12 items-center gap-2 border-b px-4 text-sm font-semibold">
-      <span className="size-5 rounded-md bg-primary" aria-hidden />
-      Tracker
+    <div className="flex h-12 items-center border-b px-4 text-sm">
+      <Logo />
     </div>
   )
 }
