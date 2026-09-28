@@ -18,7 +18,7 @@ A personal task tracker for juggling coursework and work projects: a Kanban boar
 - **Stats:** current and longest streak, completions this week and all time, on-time rate against deadlines, a 26-week activity heatmap, completions per week, breakdowns by priority, workspace and project, and a table of recent completions. The sidebar and filters scope it, except the due-date filter.
 - **Reminders:** push notifications and a calendar feed (see [Notifications](#notifications)).
 - **Shortcuts:** `n` new task · `/` focus search · `Esc` close the editor · `Space` to pick up and drop a focused card · `Enter` to open it.
-- Dark mode by default with a light-mode toggle. On mobile the board scrolls one column at a time and the sidebar becomes a drawer.
+- Themes: Dark (default), Light, Green, Brown and Pastel pink, chosen from the palette button in the header and remembered per browser. Accent themes keep white surfaces; `tests/theme.test.ts` checks each palette's text contrast against WCAG AA. On mobile the board scrolls one column at a time and the sidebar becomes a drawer.
 
 ## Local setup
 

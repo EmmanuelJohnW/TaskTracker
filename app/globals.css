@@ -3,7 +3,7 @@
 @import "shadcn/tailwind.css";
 @plugin "@tailwindcss/typography";
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 @theme inline {
   --color-background: var(--background);
@@ -50,6 +50,8 @@
 }
 
 :root {
+  color-scheme: light;
+  --logo: #4f46e5;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -92,7 +94,8 @@
   --viz-grid: #e1e0d9;
 }
 
-.dark {
+[data-theme="dark"] {
+  color-scheme: dark;
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -132,6 +135,69 @@
   --viz-heat-3: #5598e7;
   --viz-heat-4: #9ec5f4;
   --viz-grid: #2c2c2a;
+}
+
+/* Accent themes: white surfaces, tinted chrome, each with its own accent.
+   Button text contrast is verified in tests/theme.test.ts (WCAG AA). */
+[data-theme="green"] {
+  --primary: #15803d;
+  --primary-foreground: #ffffff;
+  --ring: #16a34a;
+  --secondary: #eef7f1;
+  --secondary-foreground: #14532d;
+  --muted: #eef7f1;
+  --accent: #e3f3e8;
+  --accent-foreground: #14532d;
+  --border: #dbe9df;
+  --input: #d3e5d8;
+  --sidebar: #f3faf5;
+  --sidebar-accent: #e3f3e8;
+  --sidebar-accent-foreground: #14532d;
+  --sidebar-border: #dbe9df;
+  --sidebar-primary: #15803d;
+  --sidebar-primary-foreground: #ffffff;
+  --logo: #15803d;
+}
+
+[data-theme="brown"] {
+  --primary: #8b5e3c;
+  --primary-foreground: #ffffff;
+  --ring: #a47148;
+  --secondary: #f5efe7;
+  --secondary-foreground: #4a3222;
+  --muted: #f5efe7;
+  --accent: #efe5d8;
+  --accent-foreground: #4a3222;
+  --border: #e8ddd0;
+  --input: #e2d5c5;
+  --sidebar: #faf6f1;
+  --sidebar-accent: #efe5d8;
+  --sidebar-accent-foreground: #4a3222;
+  --sidebar-border: #e8ddd0;
+  --sidebar-primary: #8b5e3c;
+  --sidebar-primary-foreground: #ffffff;
+  --logo: #8b5e3c;
+}
+
+/* Pastel pink is too light for white text, so buttons use deep plum text. */
+[data-theme="pink"] {
+  --primary: #f9a8c9;
+  --primary-foreground: #5b1a3a;
+  --ring: #ec86b1;
+  --secondary: #fce7f0;
+  --secondary-foreground: #6b2147;
+  --muted: #fce7f0;
+  --accent: #fbd9e8;
+  --accent-foreground: #6b2147;
+  --border: #f5d5e3;
+  --input: #f0c9da;
+  --sidebar: #fdf2f7;
+  --sidebar-accent: #fbd9e8;
+  --sidebar-accent-foreground: #6b2147;
+  --sidebar-border: #f5d5e3;
+  --sidebar-primary: #f9a8c9;
+  --sidebar-primary-foreground: #5b1a3a;
+  --logo: #db5a8f;
 }
 
 @layer base {

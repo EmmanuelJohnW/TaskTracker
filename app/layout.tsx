@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google"
 import { ThemeProvider } from "@/components/app/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
 import { TooltipProvider } from "@/components/ui/tooltip"
+import { DEFAULT_THEME, THEME_IDS } from "@/lib/theme"
 
 import "./globals.css"
 
@@ -30,7 +31,16 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
+        <ThemeProvider
+          attribute="data-theme"
+          themes={THEME_IDS}
+          defaultTheme={DEFAULT_THEME}
+          enableSystem={false}
+          // globals.css sets color-scheme per theme; next-themes only knows
+          // "light"/"dark" and would leave a stale inline value on accent themes.
+          enableColorScheme={false}
+          disableTransitionOnChange
+        >
           <TooltipProvider>{children}</TooltipProvider>
           <Toaster position="bottom-right" richColors closeButton />
         </ThemeProvider>
